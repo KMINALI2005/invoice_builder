@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>فواتير العراق - التطبيق المحترافي</title>
+    
+    <!-- Bootstrap 5 RTL -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Signature Pad -->
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- html2canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #1a472a;
+            --secondary-color: #3d8b40;
+            --accent-color: #f39c12;
+            --danger-color: #c0392b;
+            --dark-bg: #1a1a1a;
+            --light-bg: #f5f5f5;
+            --card-bg: #ffffff;
+            --text-primary: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --border-color: #e0e0e0;
+            --shadow: 0 4px 20px rgba(0,0,0,0.1);
+            --shadow-hover: 0 8px 30px rgba(0,0,0,0.15);
+        }
+
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            max-width: 100%;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .app-header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .app-content {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-bottom: 2px solid var(--border-color);
+            padding: 20px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .form-control, .form-select {
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            padding: 15px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+            margin-bottom: 15px;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(61, 139, 64, 0.1);
+            outline: none;
+        }
+
+        .btn {
+            border-radius: 15px;
+            padding: 15px 25px;
+            font-weight: 600;
+            font-size: 16px;
+            border: none;
+            transition: all 0.3s ease;
+            margin: 5px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(61, 139, 64, 0.3);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.3);
+            color: white;
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .btn-info:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger-color), #e74c3c);
+            color: white;
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(192, 57, 43, 0.3);
+            color: white;
+        }
+
+        .table {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            background: white;
+        }
+
+        .table thead {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .table thead th {
+            border: none;
+            padding: 15px 10px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .table tbody td {
+            padding: 15px 10px;
+            vertical-align: middle;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .totals-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .total-row:last-child {
+            border-bottom: none;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            background: linear-gradient(90deg, transparent, rgba(61, 139, 64, 0.1));
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .signature-container {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .signature-pad {
+            border: 3px dashed var(--border-color);
+            border-radius: 15px;
+            background: white;
+            cursor: crosshair;
+            width: 100%;
+            height: 200px;
+            touch-action: none;
+        }
+
+        .app-footer {
+            background: white;
+            padding: 20px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            bottom: 0;
+            z-index: 1000;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .action-buttons .btn {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .saved-invoices-drawer {
+            position: fixed;
+            top: 0;
+            right: -350px;
+            width: 350px;
+            height: 100vh;
+            background: white;
+            box-shadow: -4px 0 20px rgba(0,0,0,0.1);
+            transition: right 0.3s ease;
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .saved-invoices-drawer.open {
+            right: 0;
+        }
+
+        .drawer-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .saved-invoice-item {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .saved-invoice-item:hover {
+            background-color: #f8f9fa;
+            transform: translateX(-5px);
+        }
+
+        .saved-invoice-item:last-child {
+            border-bottom: none;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 1999;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+        }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--secondary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px 25px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            z-index: 4000;
+            animation: slideUp 0.3s ease-out;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translate(-50%, 100px);
+            }
+            to { 
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+        }
+
+        .fab {
+            position: fixed;
+            bottom: 120px;
+            left: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-color), #e67e22);
+            color: white;
+            border: none;
+            box-shadow: var(--shadow);
+            font-size: 24px;
+            z-index: 1500;
+            transition: all 0.3s ease;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .app-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .card {
+                margin-bottom: 15px;
+            }
+            
+            .action-buttons .btn {
+                font-size: 14px;
+                padding: 12px 20px;
+            }
+            
+            .saved-invoices-drawer {
+                width: 100%;
+                right: -100%;
+            }
+            
+            .table {
+                font-size: 14px;
+            }
+            
+            .table thead th {
+                font-size: 12px;
+                padding: 10px 5px;
+            }
+            
+            .table tbody td {
+                padding: 10px 5px;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            
+            .app-container {
+                background: white;
+            }
+            
+            .card {
+                box-shadow: none;
+                margin-bottom: 10px;
+            }
+        }
+
+        /* Android-specific optimizations */
+        @supports (-webkit-touch-callout: none) {
+            .btn {
+                -webkit-tap-highlight-color: rgba(0,0,0,0);
+            }
+            
+            .form-control, .form-select {
+                font-size: 16px; /* Prevent zoom on focus */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <div class="app-header">
+            <h1><i class="fas fa-file-invoice-dollar"></i> فواتير العراق</h1>
+        </div>
+
+        <!-- Main Content -->
+        <div class="app-content" id="invoiceContent">
+            <!-- Customer Info Card -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-user"></i> معلومات الزبون
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" id="customerName" placeholder="اسم الزبون">
+                        </div>
+                        <div class="col-md-6">
+                            <input type="tel" class="form-control" id="customerPhone" placeholder="هاتف الزبون">
+                        </div>
+                        <div class="col-12">
+                            <input type="text" class="form-control" id="customerAddress" placeholder="عنوان الزبون">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Invoice Info Card -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-info-circle"></i> معلومات الفاتورة
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="form-label">التاريخ</label>
+                            <input type="date" class="form-control" id="invoiceDate">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">رقم الفاتورة</label>
+                            <input type="text" class="form-control" id="invoiceNumber" placeholder="INV-2024-001">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">العملة</label>
+                            <select class="form-select" id="currency">
+                                <option value="IQD" selected>دينار عراقي (IQD)</option>
+                                <option value="USD">دولار أمريكي (USD)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">نسبة الضريبة (%)</label>
+                            <input type="number" class="form-control" id="taxRate" value="15" min="0" max="100">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products Card -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-box"></i> المنتجات والخدمات</span>
+                    <button class="btn btn-primary btn-sm" onclick="addProduct()">
+                        <i class="fas fa-plus"></i> إضافة
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>الوصف</th>
+                                    <th>الكمية</th>
+                                    <th>السعر</th>
+                                    <th>الإجمالي</th>
+                                    <th class="no-print">حذف</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productsTableBody">
+                                <!-- Products will be added here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="p-3 text-center text-muted no-print" id="emptyProducts">
+                        <i class="fas fa-box-open fa-2x"></i>
+                        <p class="mt-2">لا توجد منتجات مضافة</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Totals Card -->
+            <div class="totals-card">
+                <div class="total-row">
+                    <span>المجموع الفرعي:</span>
+                    <span id="subtotal">0.00</span>
+                </div>
+                <div class="total-row">
+                    <span>الضريبة (<span id="taxRateDisplay">15</span>%):</span>
+                    <span id="taxAmount">0.00</span>
+                </div>
+                <div class="total-row">
+                    <span>الإجمالي:</span>
+                    <span id="total">0.00</span>
+                </div>
+            </div>
+
+            <!-- Notes Card -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-sticky-note"></i> ملاحظات
+                </div>
+                <div class="card-body">
+                    <textarea class="form-control" id="notes" rows="3" placeholder="أي ملاحظات إضافية..."></textarea>
+                </div>
+            </div>
+
+            <!-- Signature Card -->
+            <div class="signature-container">
+                <div class="card-header">
+                    <i class="fas fa-signature"></i> التوقيع الإلكتروني
+                </div>
+                <div class="card-body">
+                    <canvas id="signaturePad" class="signature-pad"></canvas>
+                    <div class="mt-3 text-center no-print">
+                        <button class="btn btn-secondary" onclick="clearSignature()">
+                            <i class="fas fa-eraser"></i> مسح التوقيع
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="app-footer no-print">
+            <div class="action-buttons">
+                <button class="btn btn-success" onclick="saveInvoice()">
+                    <i class="fas fa-save"></i> حفظ
+                </button>
+                <button class="btn btn-info" onclick="toggleSavedInvoices()">
+                    <i class="fas fa-folder-open"></i> فواتيري
+                </button>
+                <button class="btn btn-primary" onclick="exportToPDF()">
+                    <i class="fas fa-file-pdf"></i> PDF
+                </button>
+                <button class="btn btn-secondary" onclick="clearInvoice()">
+                    <i class="fas fa-redo"></i> جديد
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAB for quick actions -->
+    <button class="fab no-print" onclick="exportToDevice()">
+        <i class="fas fa-download"></i>
+    </button>
+
+    <!-- Saved Invoices Drawer -->
+    <div class="saved-invoices-drawer" id="savedInvoicesDrawer">
+        <div class="drawer-header">
+            <h5 class="mb-0"><i class="fas fa-save"></i> فواتيري المحفوظة</h5>
+            <button class="btn btn-sm btn-light" onclick="toggleSavedInvoices()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div id="savedInvoicesList">
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <p>لا توجد فواتير محفوظة</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay" onclick="toggleSavedInvoices()"></div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+    <script>
+        // Initialize variables
+        let products = [];
+        let signaturePad;
+        let invoiceCounter = 1;
+        let savedInvoices = JSON.parse(localStorage.getItem('savedInvoices')) || [];
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSignaturePad();
+            setCurrentDate();
+            updateEmptyState();
+            updateTotals();
+            
+            // Add touch event listeners for better mobile experience
+            document.addEventListener('touchstart', function() {}, {passive: true});
+        });
+
+        // Initialize signature pad
+        function initializeSignaturePad() {
+            const canvas = document.getElementById('signaturePad');
+            signaturePad = new SignaturePad(canvas, {
+                backgroundColor: 'rgb(255, 255, 255)',
+                penColor: 'rgb(0, 0, 0)',
+                minWidth: 1,
+                maxWidth: 3,
+                throttle: 16,
+                minDistance: 5
+            });
+
+            // Resize canvas for mobile
+            function resizeCanvas() {
+                const ratio = Math.max(window.devicePixelRatio || 1, 1);
+                canvas.width = canvas.offsetWidth * ratio;
+                canvas.height = canvas.offsetHeight * ratio;
+                canvas.getContext('2d').scale(ratio, ratio);
+                signaturePad.clear();
+            }
+
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+        }
+
+        // Set current date
+        function setCurrentDate() {
+            const date = new Date();
+            const formattedDate = date.toISOString().split('T')[0];
+            document.getElementById('invoiceDate').value = formattedDate;
+            document.getElementById('invoiceNumber').value = `INV-${date.getFullYear()}-${String(invoiceCounter).padStart(3, '0')}`;
+        }
+
+        // Add product
+        function addProduct() {
+            const productId = Date.now();
+            const productRow = `
+                <tr class="product-row" id="product-${productId}">
+                    <td>
+                        <input type="text" class="form-control form-control-sm" placeholder="الوصف" 
+                               onchange="updateProduct(${productId})" id="desc-${productId}">
+                    </td>
+                    <td>
+                        <input type="number" class="form-control form-control-sm" placeholder="1" min="1" value="1"
+                               onchange="updateProduct(${productId})" id="qty-${productId}">
+                    </td>
+                    <td>
+                        <input type="number" class="form-control form-control-sm" placeholder="0.00" step="0.01" min="0"
+                               onchange="updateProduct(${productId})" id="price-${productId}">
+                    </td>
+                    <td>
+                        <span class="fw-bold" id="total-${productId}">0.00</span>
+                    </td>
+                    <td class="no-print">
+                        <button class="btn btn-danger btn-sm" onclick="removeProduct(${productId})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+            
+            document.getElementById('productsTableBody').insertAdjacentHTML('beforeend', productRow);
+            
+            products.push({
+                id: productId,
+                description: '',
+                quantity: 1,
+                price: 0,
+                total: 0
+            });
+            
+            updateEmptyState();
+        }
+
+        // Update product
+        function updateProduct(productId) {
+            const product = products.find(p => p.id === productId);
+            if (product) {
+                product.description = document.getElementById(`desc-${productId}`).value;
+                product.quantity = parseFloat(document.getElementById(`qty-${productId}`).value) || 0;
+                product.price = parseFloat(document.getElementById(`price-${productId}`).value) || 0;
+                product.total = product.quantity * product.price;
+                
+                document.getElementById(`total-${productId}`).textContent = product.total.toFixed(2);
+                updateTotals();
+            }
+        }
+
+        // Remove product
+        function removeProduct(productId) {
+            const row = document.getElementById(`product-${productId}`);
+            row.style.opacity = '0';
+            row.style.transform = 'translateX(-100%)';
+            setTimeout(() => {
+                row.remove();
+                products = products.filter(p => p.id !== productId);
+                updateTotals();
+                updateEmptyState();
+            }, 300);
+        }
+
+        // Update empty state
+        function updateEmptyState() {
+            const emptyState = document.getElementById('emptyProducts');
+            if (products.length === 0) {
+                emptyState.style.display = 'block';
+            } else {
+                emptyState.style.display = 'none';
+            }
+        }
+
+        // Update totals
+        function updateTotals() {
+            const subtotal = products.reduce((sum, product) => sum + product.total, 0);
+            const taxRate = parseFloat(document.getElementById('taxRate').value) || 0;
+            const taxAmount = subtotal * (taxRate / 100);
+            const total = subtotal + taxAmount;
+            
+            document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+            document.getElementById('taxRateDisplay').textContent = taxRate;
+            document.getElementById('taxAmount').textContent = taxAmount.toFixed(2);
+            document.getElementById('total').textContent = total.toFixed(2);
+        }
+
+        // Clear signature
+        function clearSignature() {
+            signaturePad.clear();
+        }
+
+        // Save invoice
+        function saveInvoice() {
+            const invoiceData = {
+                id: Date.now(),
+                customerName: document.getElementById('customerName').value,
+                customerAddress: document.getElementById('customerAddress').value,
+                customerPhone: document.getElementById('customerPhone').value,
+                invoiceDate: document.getElementById('invoiceDate').value,
+                invoiceNumber: document.getElementById('invoiceNumber').value,
+                currency: document.getElementById('currency').value,
+                taxRate: document.getElementById('taxRate').value,
+                products: products,
+                notes: document.getElementById('notes').value,
+                signature: signaturePad.toDataURL(),
+                subtotal: document.getElementById('subtotal').textContent,
+                taxAmount: document.getElementById('taxAmount').textContent,
+                total: document.getElementById('total').textContent,
+                savedAt: new Date().toISOString()
+            };
+
+            savedInvoices.push(invoiceData);
+            localStorage.setItem('savedInvoices', JSON.stringify(savedInvoices));
+            
+            showToast('تم حفظ الفاتورة بنجاح!', 'success');
+        }
+
+        // Toggle saved invoices drawer
+        function toggleSavedInvoices() {
+            const drawer = document.getElementById('savedInvoicesDrawer');
+            const overlay = document.getElementById('overlay');
+            
+            drawer.classList.toggle('open');
+            overlay.classList.toggle('show');
+            
+            if (drawer.classList.contains('open')) {
+                loadSavedInvoicesList();
+            }
+        }
+
+        // Load saved invoices list
+        function loadSavedInvoicesList() {
+            const listContainer = document.getElementById('savedInvoicesList');
+            
+            if (savedInvoices.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>لا توجد فواتير محفوظة</p>
+                    </div>
+                `;
+                return;
+            }
+
+            listContainer.innerHTML = savedInvoices.slice(-20).reverse().map(invoice => `
+                <div class="saved-invoice-item" onclick="loadInvoice(${invoice.id})">
+                    <div class="fw-bold">${invoice.invoiceNumber}</div>
+                    <div class="small text-muted">${invoice.customerName || 'بدون اسم'}</div>
+                    <div class="small text-muted">${new Date(invoice.savedAt).toLocaleDateString('ar-SA')}</div>
+                    <div class="small text-primary">${invoice.total} ${invoice.currency}</div>
+                </div>
+            `).join('');
+        }
+
+        // Load invoice
+        function loadInvoice(invoiceId) {
+            const invoice = savedInvoices.find(inv => inv.id === invoiceId);
+            if (!invoice) return;
+
+            // Clear current invoice
+            clearInvoice(false);
+
+            // Load invoice data
+            document.getElementById('customerName').value = invoice.customerName || '';
+            document.getElementById('customerAddress').value = invoice.customerAddress || '';
+            document.getElementById('customerPhone').value = invoice.customerPhone || '';
+            document.getElementById('invoiceDate').value = invoice.invoiceDate;
+            document.getElementById('invoiceNumber').value = invoice.invoiceNumber;
+            document.getElementById('currency').value = invoice.currency;
+            document.getElementById('taxRate').value = invoice.taxRate;
+            document.getElementById('notes').value = invoice.notes || '';
+
+            // Load products
+            products = [];
+            document.getElementById('productsTableBody').innerHTML = '';
+            
+            invoice.products.forEach(product => {
+                addProduct();
+                const productId = products[products.length - 1].id;
+                document.getElementById(`desc-${productId}`).value = product.description;
+                document.getElementById(`qty-${productId}`).value = product.quantity;
+                document.getElementById(`price-${productId}`).value = product.price;
+                updateProduct(productId);
+            });
+
+            // Load signature
+            if (invoice.signature) {
+                signaturePad.fromDataURL(invoice.signature);
+            }
+
+            updateTotals();
+            toggleSavedInvoices();
+            showToast('تم تحميل الفاتورة بنجاح!', 'info');
+        }
+
+        // Export to PDF
+        async function exportToPDF() {
+            showLoading(true);
+            
+            try {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                
+                // Hide no-print elements
+                const noPrintElements = document.querySelectorAll('.no-print');
+                noPrintElements.forEach(el => el.style.display = 'none');
+                
+                // Convert to image
+                const canvas = await html2canvas(document.getElementById('invoiceContent'), {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false
+                });
+                
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = 210;
+                const pageHeight = 295;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 0;
+                
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+                
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+                
+                // Save PDF
+                const fileName = `فاتورة-${document.getElementById('invoiceNumber').value}.pdf`;
+                pdf.save(fileName);
+                
+                showToast('تم تصدير الفاتورة بنجاح!', 'success');
+                
+            } catch (error) {
+                console.error('Error exporting PDF:', error);
+                showToast('حدث خطأ أثناء التصدير', 'error');
+            } finally {
+                // Show no-print elements
+                const noPrintElements = document.querySelectorAll('.no-print');
+                noPrintElements.forEach(el => el.style.display = '');
+                showLoading(false);
+            }
+        }
+
+        // Export to device
+        function exportToDevice() {
+            const invoiceData = {
+                customerName: document.getElementById('customerName').value,
+                invoiceNumber: document.getElementById('invoiceNumber').value,
+                total: document.getElementById('total').textContent,
+                currency: document.getElementById('currency').value,
+                date: document.getElementById('invoiceDate').value,
+                products: products,
+                exportedAt: new Date().toISOString()
+            };
+
+            const dataStr = JSON.stringify(invoiceData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            // Create download link
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `فاتورة-${document.getElementById('invoiceNumber').value}.json`;
+            link.click();
+            
+            showToast('تم حفظ الفاتورة على الجهاز!', 'success');
+        }
+
+        // Clear invoice
+        function clearInvoice(showConfirm = true) {
+            if (showConfirm && !confirm('هل أنت متأكد من إنشاء فاتورة جديدة؟')) {
+                return;
+            }
+            
+            // Clear products
+            document.getElementById('productsTableBody').innerHTML = '';
+            products = [];
+            
+            // Clear form fields
+            document.getElementById('customerName').value = '';
+            document.getElementById('customerAddress').value = '';
+            document.getElementById('customerPhone').value = '';
+            document.getElementById('notes').value = '';
+            
+            // Clear signature
+            clearSignature();
+            
+            // Update invoice number
+            invoiceCounter++;
+            const date = new Date();
+            document.getElementById('invoiceNumber').value = `INV-${date.getFullYear()}-${String(invoiceCounter).padStart(3, '0')}`;
+            
+            updateTotals();
+            updateEmptyState();
+            
+            if (showConfirm) {
+                showToast('تم إنشاء فاتورة جديدة!', 'success');
+            }
+        }
+
+        // Show loading
+        function showLoading(show) {
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (show) {
+                loadingOverlay.classList.add('show');
+            } else {
+                loadingOverlay.classList.remove('show');
+            }
+        }
+
+        // Show toast
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                info: 'fa-info-circle'
+            };
+            
+            const colors = {
+                success: '#27ae60',
+                error: '#e74c3c',
+                info: '#3498db'
+            };
+            
+            toast.innerHTML = `
+                <div style="color: ${colors[type]}">
+                    <i class="fas ${icons[type]}"></i> ${message}
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideUp 0.3s ease-out reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
+        }
+
+        // Event listeners
+        document.getElementById('taxRate').addEventListener('change', updateTotals);
+        
+        // Prevent zoom on double tap
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    </script>
+</body>
+</html>
