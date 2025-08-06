@@ -2,1076 +2,1214 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>فواتير العراق - التطبيق المحترافي</title>
-    
-    <!-- Bootstrap 5 RTL -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Signature Pad -->
-    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
-    <!-- jsPDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <!-- html2canvas -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة الديون المتقدم</title>
     <style>
-        :root {
-            --primary-color: #1a472a;
-            --secondary-color: #3d8b40;
-            --accent-color: #f39c12;
-            --danger-color: #c0392b;
-            --dark-bg: #1a1a1a;
-            --light-bg: #f5f5f5;
-            --card-bg: #ffffff;
-            --text-primary: #2c3e50;
-            --text-secondary: #7f8c8d;
-            --border-color: #e0e0e0;
-            --shadow: 0 4px 20px rgba(0,0,0,0.1);
-            --shadow-hover: 0 8px 30px rgba(0,0,0,0.15);
-        }
-
         * {
-            -webkit-tap-highlight-color: transparent;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            margin: 0;
-            padding: 0;
-            color: var(--text-primary);
-            overflow-x: hidden;
+            padding: 20px;
         }
 
-        .app-container {
-            max-width: 100%;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #666;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            font-weight: bold;
+        }
+
+        .tab:hover {
+            color: #764ba2;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
             display: flex;
             flex-direction: column;
         }
 
-        .app-header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 20px;
-            text-align: center;
-            box-shadow: var(--shadow);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .app-header h1 {
-            margin: 0;
-            font-size: 1.8rem;
-            font-weight: 700;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .app-content {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            box-shadow: var(--shadow);
-            margin-bottom: 20px;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            border: none;
-        }
-
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-hover);
-        }
-
-        .card-header {
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            border-bottom: 2px solid var(--border-color);
-            padding: 20px;
+        label {
+            margin-bottom: 8px;
+            color: #555;
             font-weight: 600;
-            color: var(--primary-color);
+            font-size: 14px;
         }
 
-        .form-control, .form-select {
-            border: 2px solid var(--border-color);
-            border-radius: 15px;
-            padding: 15px;
-            font-size: 16px;
-            transition: all 0.3s ease;
+        input, select, textarea {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
             background: white;
-            margin-bottom: 15px;
         }
 
-        .form-control:focus, .form-select:focus {
-            border-color: var(--secondary-color);
-            box-shadow: 0 0 0 3px rgba(61, 139, 64, 0.1);
+        input:focus, select:focus, textarea:focus {
             outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
         }
 
         .btn {
-            border-radius: 15px;
-            padding: 15px 25px;
-            font-weight: 600;
-            font-size: 16px;
+            padding: 12px 30px;
             border: none;
-            transition: all 0.3s ease;
-            margin: 5px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(61, 139, 64, 0.3);
-            color: white;
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
         }
 
         .btn-success {
-            background: linear-gradient(135deg, #27ae60, #2ecc71);
-            color: white;
-        }
-
-        .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.3);
-            color: white;
-        }
-
-        .btn-info {
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            color: white;
-        }
-
-        .btn-info:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
+            background: #10b981;
             color: white;
         }
 
         .btn-danger {
-            background: linear-gradient(135deg, var(--danger-color), #e74c3c);
+            background: #ef4444;
             color: white;
-            padding: 10px 20px;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-info {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
             font-size: 14px;
         }
 
-        .btn-danger:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(192, 57, 43, 0.3);
-            color: white;
-        }
-
-        .table {
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            background: white;
-        }
-
-        .table thead {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-        }
-
-        .table thead th {
-            border: none;
-            padding: 15px 10px;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .table tbody td {
-            padding: 15px 10px;
-            vertical-align: middle;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .table tbody tr:hover {
-            background-color: #f8f9fa;
-        }
-
-        .totals-card {
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            border-radius: 20px;
-            padding: 20px;
-            margin-top: 20px;
-        }
-
-        .total-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .total-row:last-child {
-            border-bottom: none;
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: var(--primary-color);
-            background: linear-gradient(90deg, transparent, rgba(61, 139, 64, 0.1));
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 10px;
-        }
-
-        .signature-container {
-            background: white;
-            border-radius: 20px;
-            padding: 20px;
-            margin-top: 20px;
-            box-shadow: var(--shadow);
-        }
-
-        .signature-pad {
-            border: 3px dashed var(--border-color);
-            border-radius: 15px;
-            background: white;
-            cursor: crosshair;
+        .debts-table {
             width: 100%;
-            height: 200px;
-            touch-action: none;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
         }
 
-        .app-footer {
+        .debts-table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .debts-table th, .debts-table td {
+            padding: 15px;
+            text-align: right;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .debts-table tbody tr:hover {
+            background: #f8f9fa;
+            transition: background 0.3s;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-paid {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-partial {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-overdue {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
             background: white;
             padding: 20px;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
-            position: sticky;
-            bottom: 0;
-            z-index: 1000;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            transition: transform 0.3s;
         }
 
-        .action-buttons {
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .filter-section {
             display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
+            align-items: center;
         }
 
-        .action-buttons .btn {
+        .search-box {
             flex: 1;
-            min-width: 120px;
+            min-width: 200px;
         }
 
-        .saved-invoices-drawer {
+        .modal {
+            display: none;
             position: fixed;
             top: 0;
-            right: -350px;
-            width: 350px;
-            height: 100vh;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
             background: white;
-            box-shadow: -4px 0 20px rgba(0,0,0,0.1);
-            transition: right 0.3s ease;
-            z-index: 2000;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
             overflow-y: auto;
         }
 
-        .saved-invoices-drawer.open {
-            right: 0;
-        }
-
-        .drawer-header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 20px;
+        .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 20px;
         }
 
-        .saved-invoice-item {
-            padding: 15px;
-            border-bottom: 1px solid var(--border-color);
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            color: #666;
         }
 
-        .saved-invoice-item:hover {
-            background-color: #f8f9fa;
-            transform: translateX(-5px);
+        .payment-history {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
         }
 
-        .saved-invoice-item:last-child {
+        .payment-item {
+            padding: 8px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .payment-item:last-child {
             border-bottom: none;
         }
 
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            z-index: 1999;
-        }
-
-        .overlay.show {
-            display: block;
-        }
-
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255,255,255,0.9);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 3000;
-        }
-
-        .loading-overlay.show {
-            display: flex;
-        }
-
-        .spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--secondary-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .toast {
-            position: fixed;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
+        .chart-container {
             background: white;
-            padding: 15px 25px;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
             border-radius: 15px;
-            box-shadow: var(--shadow);
-            z-index: 4000;
-            animation: slideUp 0.3s ease-out;
-            min-width: 200px;
-            text-align: center;
+            overflow: hidden;
+            position: relative;
         }
 
-        @keyframes slideUp {
-            from { 
-                opacity: 0;
-                transform: translate(-50%, 100px);
-            }
-            to { 
-                opacity: 1;
-                transform: translate(-50%, 0);
-            }
-        }
-
-        .fab {
-            position: fixed;
-            bottom: 120px;
-            left: 20px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-color), #e67e22);
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: white;
-            border: none;
-            box-shadow: var(--shadow);
-            font-size: 24px;
-            z-index: 1500;
-            transition: all 0.3s ease;
+            font-weight: bold;
         }
 
-        .fab:hover {
-            transform: scale(1.1);
-            box-shadow: var(--shadow-hover);
+        .actions-cell {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
         }
 
         .empty-state {
             text-align: center;
-            padding: 40px 20px;
-            color: var(--text-secondary);
+            padding: 60px 20px;
+            color: #999;
         }
 
-        .empty-state i {
-            font-size: 64px;
+        .empty-state svg {
+            width: 100px;
+            height: 100px;
             margin-bottom: 20px;
-            opacity: 0.5;
+            opacity: 0.3;
         }
 
         @media (max-width: 768px) {
-            .app-header h1 {
-                font-size: 1.5rem;
+            .container {
+                padding: 15px;
             }
-            
-            .card {
-                margin-bottom: 15px;
+
+            h1 {
+                font-size: 1.8em;
             }
-            
-            .action-buttons .btn {
-                font-size: 14px;
-                padding: 12px 20px;
+
+            .form-grid {
+                grid-template-columns: 1fr;
             }
-            
-            .saved-invoices-drawer {
-                width: 100%;
-                right: -100%;
+
+            .stats-grid {
+                grid-template-columns: 1fr;
             }
-            
-            .table {
+
+            .debts-table {
                 font-size: 14px;
             }
-            
-            .table thead th {
-                font-size: 12px;
+
+            .debts-table th, .debts-table td {
                 padding: 10px 5px;
             }
-            
-            .table tbody td {
-                padding: 10px 5px;
+
+            .actions-cell {
+                flex-direction: column;
             }
         }
 
-        /* Print styles */
-        @media print {
-            .no-print {
-                display: none !important;
-            }
-            
-            .app-container {
-                background: white;
-            }
-            
-            .card {
-                box-shadow: none;
-                margin-bottom: 10px;
-            }
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            z-index: 2000;
+            display: none;
+            animation: slideDown 0.3s;
         }
 
-        /* Android-specific optimizations */
-        @supports (-webkit-touch-callout: none) {
-            .btn {
-                -webkit-tap-highlight-color: rgba(0,0,0,0);
-            }
-            
-            .form-control, .form-select {
-                font-size: 16px; /* Prevent zoom on focus */
-            }
+        .notification.success {
+            border-right: 4px solid #10b981;
+        }
+
+        .notification.error {
+            border-right: 4px solid #ef4444;
+        }
+
+        .notification.show {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from { transform: translate(-50%, -100%); }
+            to { transform: translate(-50%, 0); }
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Header -->
-        <div class="app-header">
-            <h1><i class="fas fa-file-invoice-dollar"></i> فواتير العراق</h1>
+    <div class="container">
+        <h1>💰 نظام إدارة الديون المتقدم</h1>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('dashboard')">📊 لوحة التحكم</button>
+            <button class="tab" onclick="switchTab('add-debt')">➕ إضافة دين</button>
+            <button class="tab" onclick="switchTab('debts-list')">📋 قائمة الديون</button>
+            <button class="tab" onclick="switchTab('reports')">📈 التقارير</button>
+            <button class="tab" onclick="switchTab('settings')">⚙️ الإعدادات</button>
         </div>
 
-        <!-- Main Content -->
-        <div class="app-content" id="invoiceContent">
-            <!-- Customer Info Card -->
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-user"></i> معلومات الزبون
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalDebts">0</div>
+                    <div class="stat-label">إجمالي الديون</div>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <input type="text" class="form-control" id="customerName" placeholder="اسم الزبون">
-                        </div>
-                        <div class="col-md-6">
-                            <input type="tel" class="form-control" id="customerPhone" placeholder="هاتف الزبون">
-                        </div>
-                        <div class="col-12">
-                            <input type="text" class="form-control" id="customerAddress" placeholder="عنوان الزبون">
-                        </div>
-                    </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalPaid">0</div>
+                    <div class="stat-label">المدفوع</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalRemaining">0</div>
+                    <div class="stat-label">المتبقي</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="debtorsCount">0</div>
+                    <div class="stat-label">عدد المدينين</div>
                 </div>
             </div>
 
-            <!-- Invoice Info Card -->
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-info-circle"></i> معلومات الفاتورة
+            <div class="chart-container">
+                <h3>نسبة السداد الإجمالية</h3>
+                <div class="progress-bar" style="margin-top: 20px;">
+                    <div class="progress-fill" id="overallProgress" style="width: 0%;">0%</div>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label class="form-label">التاريخ</label>
-                            <input type="date" class="form-control" id="invoiceDate">
+            </div>
+
+            <div class="form-section">
+                <h3>الديون المستحقة قريباً</h3>
+                <div id="upcomingDebts"></div>
+            </div>
+        </div>
+
+        <!-- Add Debt Tab -->
+        <div id="add-debt" class="tab-content">
+            <div class="form-section">
+                <h3>معلومات الدين الجديد</h3>
+                <form id="debtForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>اسم المدين *</label>
+                            <input type="text" id="debtorName" required>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">رقم الفاتورة</label>
-                            <input type="text" class="form-control" id="invoiceNumber" placeholder="INV-2024-001">
+                        <div class="form-group">
+                            <label>رقم الهاتف</label>
+                            <input type="tel" id="debtorPhone">
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">العملة</label>
-                            <select class="form-select" id="currency">
-                                <option value="IQD" selected>دينار عراقي (IQD)</option>
-                                <option value="USD">دولار أمريكي (USD)</option>
+                        <div class="form-group">
+                            <label>البريد الإلكتروني</label>
+                            <input type="email" id="debtorEmail">
+                        </div>
+                        <div class="form-group">
+                            <label>المبلغ الإجمالي *</label>
+                            <input type="number" id="totalAmount" required min="0" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label>المبلغ المدفوع</label>
+                            <input type="number" id="paidAmount" min="0" step="0.01" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>تاريخ الدين *</label>
+                            <input type="date" id="debtDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>تاريخ الاستحقاق</label>
+                            <input type="date" id="dueDate">
+                        </div>
+                        <div class="form-group">
+                            <label>نوع الدين</label>
+                            <select id="debtType">
+                                <option value="personal">شخصي</option>
+                                <option value="business">تجاري</option>
+                                <option value="loan">قرض</option>
+                                <option value="service">خدمة</option>
+                                <option value="other">أخرى</option>
                             </select>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">نسبة الضريبة (%)</label>
-                            <input type="number" class="form-control" id="taxRate" value="15" min="0" max="100">
-                        </div>
                     </div>
-                </div>
+                    <div class="form-group">
+                        <label>ملاحظات</label>
+                        <textarea id="notes"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <span>💾</span> حفظ الدين
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Debts List Tab -->
+        <div id="debts-list" class="tab-content">
+            <div class="filter-section">
+                <input type="text" class="search-box" id="searchInput" placeholder="🔍 البحث عن مدين...">
+                <select id="statusFilter">
+                    <option value="all">جميع الحالات</option>
+                    <option value="pending">قيد الانتظار</option>
+                    <option value="partial">مدفوع جزئياً</option>
+                    <option value="paid">مدفوع بالكامل</option>
+                    <option value="overdue">متأخر</option>
+                </select>
+                <select id="typeFilter">
+                    <option value="all">جميع الأنواع</option>
+                    <option value="personal">شخصي</option>
+                    <option value="business">تجاري</option>
+                    <option value="loan">قرض</option>
+                    <option value="service">خدمة</option>
+                    <option value="other">أخرى</option>
+                </select>
             </div>
 
-            <!-- Products Card -->
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <span><i class="fas fa-box"></i> المنتجات والخدمات</span>
-                    <button class="btn btn-primary btn-sm" onclick="addProduct()">
-                        <i class="fas fa-plus"></i> إضافة
+            <table class="debts-table">
+                <thead>
+                    <tr>
+                        <th>المدين</th>
+                        <th>المبلغ الإجمالي</th>
+                        <th>المدفوع</th>
+                        <th>المتبقي</th>
+                        <th>تاريخ الاستحقاق</th>
+                        <th>الحالة</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody id="debtsTableBody">
+                </tbody>
+            </table>
+
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                </svg>
+                <h3>لا توجد ديون مسجلة</h3>
+                <p>ابدأ بإضافة دين جديد من تبويب "إضافة دين"</p>
+            </div>
+        </div>
+
+        <!-- Reports Tab -->
+        <div id="reports" class="tab-content">
+            <div class="form-section">
+                <h3>التقارير والإحصائيات</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="avgDebtAmount">0</div>
+                        <div class="stat-label">متوسط قيمة الدين</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="collectionRate">0%</div>
+                        <div class="stat-label">معدل التحصيل</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="overdueCount">0</div>
+                        <div class="stat-label">الديون المتأخرة</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <h4>تقرير حسب نوع الدين</h4>
+                    <div id="typeReport" style="margin-top: 15px;"></div>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <button class="btn btn-info" onclick="exportData()">
+                        <span>📥</span> تصدير البيانات
+                    </button>
+                    <button class="btn btn-success" onclick="printReport()">
+                        <span>🖨️</span> طباعة التقرير
                     </button>
                 </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead>
-                                <tr>
-                                    <th>الوصف</th>
-                                    <th>الكمية</th>
-                                    <th>السعر</th>
-                                    <th>الإجمالي</th>
-                                    <th class="no-print">حذف</th>
-                                </tr>
-                            </thead>
-                            <tbody id="productsTableBody">
-                                <!-- Products will be added here -->
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="p-3 text-center text-muted no-print" id="emptyProducts">
-                        <i class="fas fa-box-open fa-2x"></i>
-                        <p class="mt-2">لا توجد منتجات مضافة</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Totals Card -->
-            <div class="totals-card">
-                <div class="total-row">
-                    <span>المجموع الفرعي:</span>
-                    <span id="subtotal">0.00</span>
-                </div>
-                <div class="total-row">
-                    <span>الضريبة (<span id="taxRateDisplay">15</span>%):</span>
-                    <span id="taxAmount">0.00</span>
-                </div>
-                <div class="total-row">
-                    <span>الإجمالي:</span>
-                    <span id="total">0.00</span>
-                </div>
-            </div>
-
-            <!-- Notes Card -->
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-sticky-note"></i> ملاحظات
-                </div>
-                <div class="card-body">
-                    <textarea class="form-control" id="notes" rows="3" placeholder="أي ملاحظات إضافية..."></textarea>
-                </div>
-            </div>
-
-            <!-- Signature Card -->
-            <div class="signature-container">
-                <div class="card-header">
-                    <i class="fas fa-signature"></i> التوقيع الإلكتروني
-                </div>
-                <div class="card-body">
-                    <canvas id="signaturePad" class="signature-pad"></canvas>
-                    <div class="mt-3 text-center no-print">
-                        <button class="btn btn-secondary" onclick="clearSignature()">
-                            <i class="fas fa-eraser"></i> مسح التوقيع
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
 
-        <!-- Footer -->
-        <div class="app-footer no-print">
-            <div class="action-buttons">
-                <button class="btn btn-success" onclick="saveInvoice()">
-                    <i class="fas fa-save"></i> حفظ
+        <!-- Settings Tab -->
+        <div id="settings" class="tab-content">
+            <div class="form-section">
+                <h3>الإعدادات</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>العملة الافتراضية</label>
+                        <select id="currency">
+                            <option value="SAR">ريال سعودي</option>
+                            <option value="USD">دولار أمريكي</option>
+                            <option value="EUR">يورو</option>
+                            <option value="AED">درهم إماراتي</option>
+                            <option value="EGP">جنيه مصري</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>تذكير تلقائي قبل الاستحقاق (أيام)</label>
+                        <input type="number" id="reminderDays" value="3" min="0">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="saveSettings()">
+                    <span>💾</span> حفظ الإعدادات
                 </button>
-                <button class="btn btn-info" onclick="toggleSavedInvoices()">
-                    <i class="fas fa-folder-open"></i> فواتيري
-                </button>
-                <button class="btn btn-primary" onclick="exportToPDF()">
-                    <i class="fas fa-file-pdf"></i> PDF
-                </button>
-                <button class="btn btn-secondary" onclick="clearInvoice()">
-                    <i class="fas fa-redo"></i> جديد
-                </button>
+
+                <div style="margin-top: 30px;">
+                    <h4>النسخ الاحتياطي</h4>
+                    <button class="btn btn-success" onclick="backupData()">
+                        <span>💾</span> نسخ احتياطي
+                    </button>
+                    <button class="btn btn-warning" onclick="restoreData()">
+                        <span>📂</span> استعادة البيانات
+                    </button>
+                    <button class="btn btn-danger" onclick="clearAllData()">
+                        <span>🗑️</span> حذف جميع البيانات
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- FAB for quick actions -->
-    <button class="fab no-print" onclick="exportToDevice()">
-        <i class="fas fa-download"></i>
-    </button>
-
-    <!-- Saved Invoices Drawer -->
-    <div class="saved-invoices-drawer" id="savedInvoicesDrawer">
-        <div class="drawer-header">
-            <h5 class="mb-0"><i class="fas fa-save"></i> فواتيري المحفوظة</h5>
-            <button class="btn btn-sm btn-light" onclick="toggleSavedInvoices()">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div id="savedInvoicesList">
-            <div class="empty-state">
-                <i class="fas fa-inbox"></i>
-                <p>لا توجد فواتير محفوظة</p>
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>إضافة دفعة</h3>
+                <button class="close-btn" onclick="closePaymentModal()">&times;</button>
+            </div>
+            <form id="paymentForm">
+                <input type="hidden" id="paymentDebtId">
+                <div class="form-group">
+                    <label>المبلغ المدفوع</label>
+                    <input type="number" id="paymentAmount" required min="0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>تاريخ الدفع</label>
+                    <input type="date" id="paymentDate" required>
+                </div>
+                <div class="form-group">
+                    <label>ملاحظات</label>
+                    <textarea id="paymentNotes"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">حفظ الدفعة</button>
+            </form>
+            <div style="margin-top: 20px;">
+                <h4>سجل المدفوعات</h4>
+                <div id="paymentHistory" class="payment-history"></div>
             </div>
         </div>
     </div>
 
-    <!-- Overlay -->
-    <div class="overlay" id="overlay" onclick="toggleSavedInvoices()"></div>
-
-    <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="spinner"></div>
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>تعديل الدين</h3>
+                <button class="close-btn" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form id="editForm">
+                <input type="hidden" id="editDebtId">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>اسم المدين</label>
+                        <input type="text" id="editDebtorName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>رقم الهاتف</label>
+                        <input type="tel" id="editDebtorPhone">
+                    </div>
+                    <div class="form-group">
+                        <label>البريد الإلكتروني</label>
+                        <input type="email" id="editDebtorEmail">
+                    </div>
+                    <div class="form-group">
+                        <label>المبلغ الإجمالي</label>
+                        <input type="number" id="editTotalAmount" required min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>تاريخ الاستحقاق</label>
+                        <input type="date" id="editDueDate">
+                    </div>
+                    <div class="form-group">
+                        <label>نوع الدين</label>
+                        <select id="editDebtType">
+                            <option value="personal">شخصي</option>
+                            <option value="business">تجاري</option>
+                            <option value="loan">قرض</option>
+                            <option value="service">خدمة</option>
+                            <option value="other">أخرى</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>ملاحظات</label>
+                    <textarea id="editNotes"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">حفظ التعديلات</button>
+            </form>
+        </div>
     </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
 
     <script>
-        // Initialize variables
-        let products = [];
-        let signaturePad;
-        let invoiceCounter = 1;
-        let savedInvoices = JSON.parse(localStorage.getItem('savedInvoices')) || [];
+        // Data Management
+        let debts = JSON.parse(localStorage.getItem('debts')) || [];
+        let settings = JSON.parse(localStorage.getItem('settings')) || {
+            currency: 'SAR',
+            reminderDays: 3
+        };
 
-        // Initialize the app
+        // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            initializeSignaturePad();
-            setCurrentDate();
-            updateEmptyState();
-            updateTotals();
-            
-            // Add touch event listeners for better mobile experience
-            document.addEventListener('touchstart', function() {}, {passive: true});
+            loadDebts();
+            updateDashboard();
+            updateReports();
+            loadSettings();
+
+            // Set today's date as default
+            document.getElementById('debtDate').valueAsDate = new Date();
+            document.getElementById('paymentDate').valueAsDate = new Date();
         });
 
-        // Initialize signature pad
-        function initializeSignaturePad() {
-            const canvas = document.getElementById('signaturePad');
-            signaturePad = new SignaturePad(canvas, {
-                backgroundColor: 'rgb(255, 255, 255)',
-                penColor: 'rgb(0, 0, 0)',
-                minWidth: 1,
-                maxWidth: 3,
-                throttle: 16,
-                minDistance: 5
-            });
-
-            // Resize canvas for mobile
-            function resizeCanvas() {
-                const ratio = Math.max(window.devicePixelRatio || 1, 1);
-                canvas.width = canvas.offsetWidth * ratio;
-                canvas.height = canvas.offsetHeight * ratio;
-                canvas.getContext('2d').scale(ratio, ratio);
-                signaturePad.clear();
-            }
-
-            resizeCanvas();
-            window.addEventListener('resize', resizeCanvas);
-        }
-
-        // Set current date
-        function setCurrentDate() {
-            const date = new Date();
-            const formattedDate = date.toISOString().split('T')[0];
-            document.getElementById('invoiceDate').value = formattedDate;
-            document.getElementById('invoiceNumber').value = `INV-${date.getFullYear()}-${String(invoiceCounter).padStart(3, '0')}`;
-        }
-
-        // Add product
-        function addProduct() {
-            const productId = Date.now();
-            const productRow = `
-                <tr class="product-row" id="product-${productId}">
-                    <td>
-                        <input type="text" class="form-control form-control-sm" placeholder="الوصف" 
-                               onchange="updateProduct(${productId})" id="desc-${productId}">
-                    </td>
-                    <td>
-                        <input type="number" class="form-control form-control-sm" placeholder="1" min="1" value="1"
-                               onchange="updateProduct(${productId})" id="qty-${productId}">
-                    </td>
-                    <td>
-                        <input type="number" class="form-control form-control-sm" placeholder="0.00" step="0.01" min="0"
-                               onchange="updateProduct(${productId})" id="price-${productId}">
-                    </td>
-                    <td>
-                        <span class="fw-bold" id="total-${productId}">0.00</span>
-                    </td>
-                    <td class="no-print">
-                        <button class="btn btn-danger btn-sm" onclick="removeProduct(${productId})">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `;
+        // Tab Switching
+        function switchTab(tabName) {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
             
-            document.getElementById('productsTableBody').insertAdjacentHTML('beforeend', productRow);
+            tabs.forEach(tab => tab.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
             
-            products.push({
-                id: productId,
-                description: '',
-                quantity: 1,
-                price: 0,
-                total: 0
-            });
-            
-            updateEmptyState();
-        }
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
 
-        // Update product
-        function updateProduct(productId) {
-            const product = products.find(p => p.id === productId);
-            if (product) {
-                product.description = document.getElementById(`desc-${productId}`).value;
-                product.quantity = parseFloat(document.getElementById(`qty-${productId}`).value) || 0;
-                product.price = parseFloat(document.getElementById(`price-${productId}`).value) || 0;
-                product.total = product.quantity * product.price;
-                
-                document.getElementById(`total-${productId}`).textContent = product.total.toFixed(2);
-                updateTotals();
+            if (tabName === 'dashboard') {
+                updateDashboard();
+            } else if (tabName === 'reports') {
+                updateReports();
             }
         }
 
-        // Remove product
-        function removeProduct(productId) {
-            const row = document.getElementById(`product-${productId}`);
-            row.style.opacity = '0';
-            row.style.transform = 'translateX(-100%)';
-            setTimeout(() => {
-                row.remove();
-                products = products.filter(p => p.id !== productId);
-                updateTotals();
-                updateEmptyState();
-            }, 300);
-        }
-
-        // Update empty state
-        function updateEmptyState() {
-            const emptyState = document.getElementById('emptyProducts');
-            if (products.length === 0) {
-                emptyState.style.display = 'block';
-            } else {
-                emptyState.style.display = 'none';
-            }
-        }
-
-        // Update totals
-        function updateTotals() {
-            const subtotal = products.reduce((sum, product) => sum + product.total, 0);
-            const taxRate = parseFloat(document.getElementById('taxRate').value) || 0;
-            const taxAmount = subtotal * (taxRate / 100);
-            const total = subtotal + taxAmount;
+        // Form Submission
+        document.getElementById('debtForm').addEventListener('submit', function(e) {
+            e.preventDefault();
             
-            document.getElementById('subtotal').textContent = subtotal.toFixed(2);
-            document.getElementById('taxRateDisplay').textContent = taxRate;
-            document.getElementById('taxAmount').textContent = taxAmount.toFixed(2);
-            document.getElementById('total').textContent = total.toFixed(2);
-        }
-
-        // Clear signature
-        function clearSignature() {
-            signaturePad.clear();
-        }
-
-        // Save invoice
-        function saveInvoice() {
-            const invoiceData = {
+            const debt = {
                 id: Date.now(),
-                customerName: document.getElementById('customerName').value,
-                customerAddress: document.getElementById('customerAddress').value,
-                customerPhone: document.getElementById('customerPhone').value,
-                invoiceDate: document.getElementById('invoiceDate').value,
-                invoiceNumber: document.getElementById('invoiceNumber').value,
-                currency: document.getElementById('currency').value,
-                taxRate: document.getElementById('taxRate').value,
-                products: products,
+                debtorName: document.getElementById('debtorName').value,
+                debtorPhone: document.getElementById('debtorPhone').value,
+                debtorEmail: document.getElementById('debtorEmail').value,
+                totalAmount: parseFloat(document.getElementById('totalAmount').value),
+                paidAmount: parseFloat(document.getElementById('paidAmount').value) || 0,
+                debtDate: document.getElementById('debtDate').value,
+                dueDate: document.getElementById('dueDate').value,
+                debtType: document.getElementById('debtType').value,
                 notes: document.getElementById('notes').value,
-                signature: signaturePad.toDataURL(),
-                subtotal: document.getElementById('subtotal').textContent,
-                taxAmount: document.getElementById('taxAmount').textContent,
-                total: document.getElementById('total').textContent,
-                savedAt: new Date().toISOString()
+                payments: [],
+                createdAt: new Date().toISOString()
             };
 
-            savedInvoices.push(invoiceData);
-            localStorage.setItem('savedInvoices', JSON.stringify(savedInvoices));
-            
-            showToast('تم حفظ الفاتورة بنجاح!', 'success');
+            if (debt.paidAmount > 0) {
+                debt.payments.push({
+                    amount: debt.paidAmount,
+                    date: debt.debtDate,
+                    notes: 'دفعة أولية'
+                });
+            }
+
+            debts.push(debt);
+            saveDebts();
+            loadDebts();
+            updateDashboard();
+            showNotification('تم إضافة الدين بنجاح', 'success');
+            document.getElementById('debtForm').reset();
+            document.getElementById('debtDate').valueAsDate = new Date();
+            switchTab('debts-list');
+        });
+
+        // Save & Load Data
+        function saveDebts() {
+            localStorage.setItem('debts', JSON.stringify(debts));
         }
 
-        // Toggle saved invoices drawer
-        function toggleSavedInvoices() {
-            const drawer = document.getElementById('savedInvoicesDrawer');
-            const overlay = document.getElementById('overlay');
-            
-            drawer.classList.toggle('open');
-            overlay.classList.toggle('show');
-            
-            if (drawer.classList.contains('open')) {
-                loadSavedInvoicesList();
+        function loadDebts() {
+            const tbody = document.getElementById('debtsTableBody');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const typeFilter = document.getElementById('typeFilter').value;
+
+            let filteredDebts = debts.filter(debt => {
+                const matchesSearch = debt.debtorName.toLowerCase().includes(searchTerm);
+                const matchesStatus = statusFilter === 'all' || getDebtStatus(debt) === statusFilter;
+                const matchesType = typeFilter === 'all' || debt.debtType === typeFilter;
+                return matchesSearch && matchesStatus && matchesType;
+            });
+
+            tbody.innerHTML = '';
+
+            if (filteredDebts.length === 0) {
+                document.getElementById('emptyState').style.display = 'block';
+                document.querySelector('.debts-table').style.display = 'none';
+            } else {
+                document.getElementById('emptyState').style.display = 'none';
+                document.querySelector('.debts-table').style.display = 'table';
+
+                filteredDebts.forEach(debt => {
+                    const remaining = debt.totalAmount - debt.paidAmount;
+                    const status = getDebtStatus(debt);
+                    const statusClass = `status-${status}`;
+                    const statusText = getStatusText(status);
+
+                    const row = `
+                        <tr>
+                            <td>
+                                <strong>${debt.debtorName}</strong>
+                                ${debt.debtorPhone ? `<br><small>${debt.debtorPhone}</small>` : ''}
+                            </td>
+                            <td>${formatCurrency(debt.totalAmount)}</td>
+                            <td>${formatCurrency(debt.paidAmount)}</td>
+                            <td>${formatCurrency(remaining)}</td>
+                            <td>${debt.dueDate || 'غير محدد'}</td>
+                            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                            <td class="actions-cell">
+                                <button class="btn btn-success btn-sm" onclick="openPaymentModal(${debt.id})">💵 دفع</button>
+                                <button class="btn btn-info btn-sm" onclick="openEditModal(${debt.id})">✏️ تعديل</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteDebt(${debt.id})">🗑️ حذف</button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
             }
         }
 
-        // Load saved invoices list
-        function loadSavedInvoicesList() {
-            const listContainer = document.getElementById('savedInvoicesList');
-            
-            if (savedInvoices.length === 0) {
-                listContainer.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-inbox"></i>
-                        <p>لا توجد فواتير محفوظة</p>
+        // Status Management
+        function getDebtStatus(debt) {
+            const remaining = debt.totalAmount - debt.paidAmount;
+            if (remaining <= 0) return 'paid';
+            if (debt.paidAmount > 0) return 'partial';
+            if (debt.dueDate && new Date(debt.dueDate) < new Date()) return 'overdue';
+            return 'pending';
+        }
+
+        function getStatusText(status) {
+            const statusTexts = {
+                'pending': 'قيد الانتظار',
+                'partial': 'مدفوع جزئياً',
+                'paid': 'مدفوع بالكامل',
+                'overdue': 'متأخر'
+            };
+            return statusTexts[status];
+        }
+
+        // Payment Modal
+        function openPaymentModal(debtId) {
+            const debt = debts.find(d => d.id === debtId);
+            if (!debt) return;
+
+            document.getElementById('paymentDebtId').value = debtId;
+            document.getElementById('paymentAmount').value = '';
+            document.getElementById('paymentAmount').max = debt.totalAmount - debt.paidAmount;
+            document.getElementById('paymentDate').valueAsDate = new Date();
+            document.getElementById('paymentNotes').value = '';
+
+            // Load payment history
+            const historyDiv = document.getElementById('paymentHistory');
+            if (debt.payments && debt.payments.length > 0) {
+                historyDiv.innerHTML = debt.payments.map(p => `
+                    <div class="payment-item">
+                        <span>${p.date}</span>
+                        <span>${formatCurrency(p.amount)}</span>
                     </div>
-                `;
-                return;
+                `).join('');
+            } else {
+                historyDiv.innerHTML = '<p style="text-align: center; color: #999;">لا توجد مدفوعات سابقة</p>';
             }
 
-            listContainer.innerHTML = savedInvoices.slice(-20).reverse().map(invoice => `
-                <div class="saved-invoice-item" onclick="loadInvoice(${invoice.id})">
-                    <div class="fw-bold">${invoice.invoiceNumber}</div>
-                    <div class="small text-muted">${invoice.customerName || 'بدون اسم'}</div>
-                    <div class="small text-muted">${new Date(invoice.savedAt).toLocaleDateString('ar-SA')}</div>
-                    <div class="small text-primary">${invoice.total} ${invoice.currency}</div>
+            document.getElementById('paymentModal').classList.add('active');
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.remove('active');
+        }
+
+        document.getElementById('paymentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const debtId = parseInt(document.getElementById('paymentDebtId').value);
+            const amount = parseFloat(document.getElementById('paymentAmount').value);
+            const date = document.getElementById('paymentDate').value;
+            const notes = document.getElementById('paymentNotes').value;
+
+            const debt = debts.find(d => d.id === debtId);
+            if (debt) {
+                debt.paidAmount += amount;
+                if (!debt.payments) debt.payments = [];
+                debt.payments.push({ amount, date, notes });
+                
+                saveDebts();
+                loadDebts();
+                updateDashboard();
+                closePaymentModal();
+                showNotification('تم تسجيل الدفعة بنجاح', 'success');
+            }
+        });
+
+        // Edit Modal
+        function openEditModal(debtId) {
+            const debt = debts.find(d => d.id === debtId);
+            if (!debt) return;
+
+            document.getElementById('editDebtId').value = debtId;
+            document.getElementById('editDebtorName').value = debt.debtorName;
+            document.getElementById('editDebtorPhone').value = debt.debtorPhone;
+            document.getElementById('editDebtorEmail').value = debt.debtorEmail;
+            document.getElementById('editTotalAmount').value = debt.totalAmount;
+            document.getElementById('editDueDate').value = debt.dueDate;
+            document.getElementById('editDebtType').value = debt.debtType;
+            document.getElementById('editNotes').value = debt.notes;
+
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+
+        document.getElementById('editForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const debtId = parseInt(document.getElementById('editDebtId').value);
+            const debtIndex = debts.findIndex(d => d.id === debtId);
+            
+            if (debtIndex !== -1) {
+                debts[debtIndex] = {
+                    ...debts[debtIndex],
+                    debtorName: document.getElementById('editDebtorName').value,
+                    debtorPhone: document.getElementById('editDebtorPhone').value,
+                    debtorEmail: document.getElementById('editDebtorEmail').value,
+                    totalAmount: parseFloat(document.getElementById('editTotalAmount').value),
+                    dueDate: document.getElementById('editDueDate').value,
+                    debtType: document.getElementById('editDebtType').value,
+                    notes: document.getElementById('editNotes').value
+                };
+                
+                saveDebts();
+                loadDebts();
+                updateDashboard();
+                closeEditModal();
+                showNotification('تم تحديث البيانات بنجاح', 'success');
+            }
+        });
+
+        // Delete Debt
+        function deleteDebt(debtId) {
+            if (confirm('هل أنت متأكد من حذف هذا الدين؟')) {
+                debts = debts.filter(d => d.id !== debtId);
+                saveDebts();
+                loadDebts();
+                updateDashboard();
+                showNotification('تم حذف الدين بنجاح', 'success');
+            }
+        }
+
+        // Dashboard Updates
+        function updateDashboard() {
+            const totalDebts = debts.reduce((sum, d) => sum + d.totalAmount, 0);
+            const totalPaid = debts.reduce((sum, d) => sum + d.paidAmount, 0);
+            const totalRemaining = totalDebts - totalPaid;
+            const debtorsCount = debts.length;
+
+            document.getElementById('totalDebts').textContent = formatCurrency(totalDebts);
+            document.getElementById('totalPaid').textContent = formatCurrency(totalPaid);
+            document.getElementById('totalRemaining').textContent = formatCurrency(totalRemaining);
+            document.getElementById('debtorsCount').textContent = debtorsCount;
+
+            // Update progress bar
+            const progressPercent = totalDebts > 0 ? (totalPaid / totalDebts * 100).toFixed(1) : 0;
+            document.getElementById('overallProgress').style.width = progressPercent + '%';
+            document.getElementById('overallProgress').textContent = progressPercent + '%';
+
+            // Update upcoming debts
+            updateUpcomingDebts();
+        }
+
+        function updateUpcomingDebts() {
+            const upcomingDiv = document.getElementById('upcomingDebts');
+            const today = new Date();
+            const upcoming = debts.filter(d => {
+                if (!d.dueDate || getDebtStatus(d) === 'paid') return false;
+                const dueDate = new Date(d.dueDate);
+                const daysDiff = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+                return daysDiff >= 0 && daysDiff <= settings.reminderDays;
+            });
+
+            if (upcoming.length === 0) {
+                upcomingDiv.innerHTML = '<p style="text-align: center; color: #999;">لا توجد ديون مستحقة قريباً</p>';
+            } else {
+                upcomingDiv.innerHTML = upcoming.map(d => {
+                    const remaining = d.totalAmount - d.paidAmount;
+                    return `
+                        <div style="padding: 10px; border-right: 3px solid #f59e0b; margin-bottom: 10px; background: #fffbeb; border-radius: 5px;">
+                            <strong>${d.debtorName}</strong> - ${formatCurrency(remaining)}
+                            <br><small>تاريخ الاستحقاق: ${d.dueDate}</small>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        // Reports
+        function updateReports() {
+            const totalDebts = debts.reduce((sum, d) => sum + d.totalAmount, 0);
+            const totalPaid = debts.reduce((sum, d) => sum + d.paidAmount, 0);
+            const avgDebt = debts.length > 0 ? totalDebts / debts.length : 0;
+            const collectionRate = totalDebts > 0 ? (totalPaid / totalDebts * 100) : 0;
+            const overdueCount = debts.filter(d => getDebtStatus(d) === 'overdue').length;
+
+            document.getElementById('avgDebtAmount').textContent = formatCurrency(avgDebt);
+            document.getElementById('collectionRate').textContent = collectionRate.toFixed(1) + '%';
+            document.getElementById('overdueCount').textContent = overdueCount;
+
+            // Type report
+            const typeReport = {};
+            debts.forEach(d => {
+                if (!typeReport[d.debtType]) {
+                    typeReport[d.debtType] = { count: 0, total: 0, paid: 0 };
+                }
+                typeReport[d.debtType].count++;
+                typeReport[d.debtType].total += d.totalAmount;
+                typeReport[d.debtType].paid += d.paidAmount;
+            });
+
+            const typeReportDiv = document.getElementById('typeReport');
+            const typeNames = {
+                'personal': 'شخصي',
+                'business': 'تجاري',
+                'loan': 'قرض',
+                'service': 'خدمة',
+                'other': 'أخرى'
+            };
+
+            typeReportDiv.innerHTML = Object.entries(typeReport).map(([type, data]) => `
+                <div style="padding: 15px; background: #f8f9fa; border-radius: 8px; margin-bottom: 10px;">
+                    <strong>${typeNames[type] || type}</strong>
+                    <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+                        <span>العدد: ${data.count}</span>
+                        <span>الإجمالي: ${formatCurrency(data.total)}</span>
+                        <span>المحصل: ${formatCurrency(data.paid)}</span>
+                    </div>
                 </div>
             `).join('');
         }
 
-        // Load invoice
-        function loadInvoice(invoiceId) {
-            const invoice = savedInvoices.find(inv => inv.id === invoiceId);
-            if (!invoice) return;
-
-            // Clear current invoice
-            clearInvoice(false);
-
-            // Load invoice data
-            document.getElementById('customerName').value = invoice.customerName || '';
-            document.getElementById('customerAddress').value = invoice.customerAddress || '';
-            document.getElementById('customerPhone').value = invoice.customerPhone || '';
-            document.getElementById('invoiceDate').value = invoice.invoiceDate;
-            document.getElementById('invoiceNumber').value = invoice.invoiceNumber;
-            document.getElementById('currency').value = invoice.currency;
-            document.getElementById('taxRate').value = invoice.taxRate;
-            document.getElementById('notes').value = invoice.notes || '';
-
-            // Load products
-            products = [];
-            document.getElementById('productsTableBody').innerHTML = '';
-            
-            invoice.products.forEach(product => {
-                addProduct();
-                const productId = products[products.length - 1].id;
-                document.getElementById(`desc-${productId}`).value = product.description;
-                document.getElementById(`qty-${productId}`).value = product.quantity;
-                document.getElementById(`price-${productId}`).value = product.price;
-                updateProduct(productId);
-            });
-
-            // Load signature
-            if (invoice.signature) {
-                signaturePad.fromDataURL(invoice.signature);
-            }
-
-            updateTotals();
-            toggleSavedInvoices();
-            showToast('تم تحميل الفاتورة بنجاح!', 'info');
+        // Settings
+        function loadSettings() {
+            document.getElementById('currency').value = settings.currency;
+            document.getElementById('reminderDays').value = settings.reminderDays;
         }
 
-        // Export to PDF
-        async function exportToPDF() {
-            showLoading(true);
+        function saveSettings() {
+            settings.currency = document.getElementById('currency').value;
+            settings.reminderDays = parseInt(document.getElementById('reminderDays').value);
+            localStorage.setItem('settings', JSON.stringify(settings));
+            showNotification('تم حفظ الإعدادات بنجاح', 'success');
+            updateDashboard();
+        }
+
+        // Data Management
+        function exportData() {
+            const dataStr = JSON.stringify({ debts, settings }, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            const exportFileDefaultName = `debts_backup_${new Date().toISOString().split('T')[0]}.json`;
             
-            try {
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                
-                // Hide no-print elements
-                const noPrintElements = document.querySelectorAll('.no-print');
-                noPrintElements.forEach(el => el.style.display = 'none');
-                
-                // Convert to image
-                const canvas = await html2canvas(document.getElementById('invoiceContent'), {
-                    scale: 2,
-                    useCORS: true,
-                    logging: false
-                });
-                
-                const imgData = canvas.toDataURL('image/png');
-                const imgWidth = 210;
-                const pageHeight = 295;
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                let heightLeft = imgHeight;
-                let position = 0;
-                
-                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
-                
-                while (heightLeft >= 0) {
-                    position = heightLeft - imgHeight;
-                    pdf.addPage();
-                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            showNotification('تم تصدير البيانات بنجاح', 'success');
+        }
+
+        function backupData() {
+            exportData();
+        }
+
+        function restoreData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = event => {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        if (data.debts) {
+                            debts = data.debts;
+                            saveDebts();
+                        }
+                        if (data.settings) {
+                            settings = data.settings;
+                            localStorage.setItem('settings', JSON.stringify(settings));
+                        }
+                        loadDebts();
+                        updateDashboard();
+                        loadSettings();
+                        showNotification('تم استعادة البيانات بنجاح', 'success');
+                    } catch (error) {
+                        showNotification('خطأ في استعادة البيانات', 'error');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function clearAllData() {
+            if (confirm('هل أنت متأكد من حذف جميع البيانات؟ هذا الإجراء لا يمكن التراجع عنه!')) {
+                if (confirm('تأكيد نهائي: سيتم حذف جميع البيانات نهائياً!')) {
+                    debts = [];
+                    saveDebts();
+                    loadDebts();
+                    updateDashboard();
+                    showNotification('تم حذف جميع البيانات', 'success');
                 }
-                
-                // Save PDF
-                const fileName = `فاتورة-${document.getElementById('invoiceNumber').value}.pdf`;
-                pdf.save(fileName);
-                
-                showToast('تم تصدير الفاتورة بنجاح!', 'success');
-                
-            } catch (error) {
-                console.error('Error exporting PDF:', error);
-                showToast('حدث خطأ أثناء التصدير', 'error');
-            } finally {
-                // Show no-print elements
-                const noPrintElements = document.querySelectorAll('.no-print');
-                noPrintElements.forEach(el => el.style.display = '');
-                showLoading(false);
             }
         }
 
-        // Export to device
-        function exportToDevice() {
-            const invoiceData = {
-                customerName: document.getElementById('customerName').value,
-                invoiceNumber: document.getElementById('invoiceNumber').value,
-                total: document.getElementById('total').textContent,
-                currency: document.getElementById('currency').value,
-                date: document.getElementById('invoiceDate').value,
-                products: products,
-                exportedAt: new Date().toISOString()
+        function printReport() {
+            window.print();
+        }
+
+        // Utility Functions
+        function formatCurrency(amount) {
+            const currencies = {
+                'SAR': 'ر.س',
+                'USD': '$',
+                'EUR': '€',
+                'AED': 'د.إ',
+                'EGP': 'ج.م'
             };
-
-            const dataStr = JSON.stringify(invoiceData, null, 2);
-            const dataBlob = new Blob([dataStr], {type: 'application/json'});
-            
-            // Create download link
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(dataBlob);
-            link.download = `فاتورة-${document.getElementById('invoiceNumber').value}.json`;
-            link.click();
-            
-            showToast('تم حفظ الفاتورة على الجهاز!', 'success');
+            return `${amount.toFixed(2)} ${currencies[settings.currency] || settings.currency}`;
         }
 
-        // Clear invoice
-        function clearInvoice(showConfirm = true) {
-            if (showConfirm && !confirm('هل أنت متأكد من إنشاء فاتورة جديدة؟')) {
-                return;
-            }
-            
-            // Clear products
-            document.getElementById('productsTableBody').innerHTML = '';
-            products = [];
-            
-            // Clear form fields
-            document.getElementById('customerName').value = '';
-            document.getElementById('customerAddress').value = '';
-            document.getElementById('customerPhone').value = '';
-            document.getElementById('notes').value = '';
-            
-            // Clear signature
-            clearSignature();
-            
-            // Update invoice number
-            invoiceCounter++;
-            const date = new Date();
-            document.getElementById('invoiceNumber').value = `INV-${date.getFullYear()}-${String(invoiceCounter).padStart(3, '0')}`;
-            
-            updateTotals();
-            updateEmptyState();
-            
-            if (showConfirm) {
-                showToast('تم إنشاء فاتورة جديدة!', 'success');
-            }
-        }
-
-        // Show loading
-        function showLoading(show) {
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            if (show) {
-                loadingOverlay.classList.add('show');
-            } else {
-                loadingOverlay.classList.remove('show');
-            }
-        }
-
-        // Show toast
-        function showToast(message, type = 'success') {
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            
-            const icons = {
-                success: 'fa-check-circle',
-                error: 'fa-exclamation-circle',
-                info: 'fa-info-circle'
-            };
-            
-            const colors = {
-                success: '#27ae60',
-                error: '#e74c3c',
-                info: '#3498db'
-            };
-            
-            toast.innerHTML = `
-                <div style="color: ${colors[type]}">
-                    <i class="fas ${icons[type]}"></i> ${message}
-                </div>
-            `;
-            
-            document.body.appendChild(toast);
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
             
             setTimeout(() => {
-                toast.style.animation = 'slideUp 0.3s ease-out reverse';
-                setTimeout(() => toast.remove(), 300);
-            }, 2000);
+                notification.classList.remove('show');
+            }, 3000);
         }
 
-        // Event listeners
-        document.getElementById('taxRate').addEventListener('change', updateTotals);
-        
-        // Prevent zoom on double tap
-        let lastTouchEnd = 0;
-        document.addEventListener('touchend', function (event) {
-            const now = (new Date()).getTime();
-            if (now - lastTouchEnd <= 300) {
-                event.preventDefault();
+        // Search and Filter
+        document.getElementById('searchInput').addEventListener('input', loadDebts);
+        document.getElementById('statusFilter').addEventListener('change', loadDebts);
+        document.getElementById('typeFilter').addEventListener('change', loadDebts);
+
+        // Close modals on outside click
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
             }
-            lastTouchEnd = now;
-        }, false);
+        }
     </script>
 </body>
 </html>
